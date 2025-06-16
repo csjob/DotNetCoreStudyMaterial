@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DotNetCoreWebAPI.DI;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCoreWebAPI.Controllers
@@ -7,6 +8,12 @@ namespace DotNetCoreWebAPI.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        private readonly IMessageService _messageService;
+        public ProductController(IMessageService messageService)
+        {
+            _messageService= messageService;
+        }
+
         [HttpGet]
         public IActionResult GetAll() => Ok(new[] {"Audi", "Benz", "BMW"});
 
@@ -15,5 +22,8 @@ namespace DotNetCoreWebAPI.Controllers
 
         [HttpPost]
         public IActionResult Create([FromBody] string model) => Ok($"{model} created.");
+
+        [HttpGet("GetMessage")]
+        public IActionResult GetMessage() => Ok(_messageService.GetMessage());
     }
 }
