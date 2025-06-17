@@ -1,5 +1,7 @@
 using DotNetCoreWebAPI.DI;
 using DotNetCoreWebAPI.Middleware;
+using DotNetCoreWebAPI.Model.Db;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+options.UseInMemoryDatabase("TestDb"));
 
 var app = builder.Build();
 
