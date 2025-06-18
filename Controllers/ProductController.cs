@@ -3,6 +3,7 @@ using DotNetCoreWebAPI.Model;
 using DotNetCoreWebAPI.Model.Db;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCoreWebAPI.Controllers
 {
@@ -10,36 +11,78 @@ namespace DotNetCoreWebAPI.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IMessageService _messageService;
-        private readonly AppDbContext _context;
+        #region For Practicing day 1 to day 3 
+        //private readonly IMessageService _messageService;
+        //private readonly AppDbContext _context;
 
-        public ProductController(IMessageService messageService, AppDbContext context)
-        {
-            _messageService= messageService;
-            _context= context;
-        }
+        //public ProductController(IMessageService messageService, AppDbContext context)
+        //{
+        //    _messageService= messageService;
+        //    _context= context;
+        //}
+
+        //[HttpGet]
+        //public IActionResult GetAll() => Ok(new[] {"Audi", "Benz", "BMW"});
+
+        //[HttpGet("{id}")]
+        //public IActionResult GetById(int id) => Ok($"Car {id}");
+
+        //[HttpPost]
+        //public IActionResult Create([FromBody] string model) => Ok($"{model} created.");
+
+        //[HttpGet("GetMessage")]
+        //public IActionResult GetMessage() => Ok(_messageService.GetMessage());
+
+        //[HttpPost("AddProduct")]
+        //public IActionResult AddProduct(Product product)
+        //{
+        //    _context.Products.Add(product);
+        //    _context.SaveChanges();
+        //    return Ok(product);
+        //}
+
+        //[HttpGet("GetProducts")]
+        //public IActionResult GetProducts() => Ok(_context.Products.ToList());
+        #endregion
+
+        #region for EF Crud Operation with MySQL
+        private readonly AppDbContext _dbContext;
+        public ProductController(AppDbContext dbContext) => _dbContext = dbContext;
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(new[] {"Audi", "Benz", "BMW"});
-
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id) => Ok($"Car {id}");
+        public async Task<IActionResult> GetAll() => 
+            Ok(await _dbContext.Products.ToListAsync());
 
         [HttpPost]
-        public IActionResult Create([FromBody] string model) => Ok($"{model} created.");
-
-        [HttpGet("GetMessage")]
-        public IActionResult GetMessage() => Ok(_messageService.GetMessage());
-
-        [HttpPost("AddProduct")]
-        public IActionResult AddProduct(Product product)
+        public async Task<IActionResult> Create(Product product)
         {
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            _dbContext.Products.Add(product);
+            await _dbContext.SaveChangesAsync();
             return Ok(product);
         }
 
-        [HttpGet("GetProducts")]
-        public IActionResult GetProducts() => Ok(_context.Products.ToList());
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Product product)
+        {
+            var existing = await _dbContext.Products.FindAsync(id);
+            if (existing == null) return NotFound();
+
+            existing.Name = product.Name;
+            existing.Price= product.Price;
+            await _dbContext.SaveChangesAsync();
+            return Ok(existing);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _dbContext.Products.FindAsync(id);
+            if(product == null) return NotFound();
+
+            _dbContext.Products.Remove(product);    
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+        }
+        #endregion
     }
 }

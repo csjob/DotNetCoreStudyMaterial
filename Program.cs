@@ -13,8 +13,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
 
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//options.UseInMemoryDatabase("TestDb"));
+
+var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseInMemoryDatabase("TestDb"));
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 var app = builder.Build();
 

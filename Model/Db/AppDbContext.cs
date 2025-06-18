@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+
 namespace DotNetCoreWebAPI.Model.Db
 {
     public class AppDbContext: DbContext
