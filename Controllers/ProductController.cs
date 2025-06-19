@@ -84,5 +84,44 @@ namespace DotNetCoreWebAPI.Controllers
             return Ok();
         }
         #endregion
+
+        #region Different Actions using LINQ
+
+        [HttpGet("GetExpensiveProducts")]
+        public async Task<IActionResult> GetExpensiveProducts()
+        {
+            var expensiveProduct = await _dbContext.Products
+                .Where(p => p.Price > 500)
+                .ToListAsync();
+            return Ok(expensiveProduct);    
+        }
+
+        [HttpGet("SortProducts")]
+        public async Task<IActionResult> SortProducts()
+        {
+            var sorted = await _dbContext.Products
+               .OrderBy(p => p.Price)
+               .ToListAsync();
+            return Ok(sorted);    
+        }
+
+        [HttpGet("GetProductNames")]
+        public async Task<IActionResult> GetProductNames()
+        {
+            var names = await _dbContext.Products
+                 .Select(p => p.Name)
+                 .ToListAsync();
+            return Ok(names);    
+        }
+
+        [HttpGet("GetProductNames/{id}")]
+        public async Task<IActionResult> GetByProductId(int id)
+        {
+            var single = await _dbContext.Products
+                .FirstOrDefaultAsync(p => p.Id == id);
+            return Ok(single);    
+        }
+
+        #endregion
     }
 }
