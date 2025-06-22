@@ -1,12 +1,14 @@
 ﻿using DotNetCoreWebAPI.DI;
 using DotNetCoreWebAPI.Model;
 using DotNetCoreWebAPI.Model.Db;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCoreWebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
