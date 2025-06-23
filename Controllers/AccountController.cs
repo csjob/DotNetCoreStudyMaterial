@@ -25,5 +25,38 @@ namespace DotNetCoreWebAPI.Controllers
             }
             return Unauthorized();
         }
+
+        [HttpGet("StoreCookie")]
+        public IActionResult StoreCookie()
+        {
+            Response.Cookies.Append("userToken", "abc123", new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.AddDays(1)
+            });
+            return Ok();
+        }
+
+        [HttpGet("GetCookie")]
+        public IActionResult GetCookie()
+        {
+            string? token = Request.Cookies["userToken"];
+            return Ok(token);
+        }
+
+        [HttpGet("StoreSession")]
+        public IActionResult StoreSession()
+        {
+            HttpContext.Session.SetString("username", "JobCS");
+            return Ok();
+        }
+
+        [HttpGet("GetSession")]
+        public IActionResult GetSession()
+        {
+            var user = HttpContext.Session.GetString("username");
+            return Ok(user);
+        }
+
+
     }
 }

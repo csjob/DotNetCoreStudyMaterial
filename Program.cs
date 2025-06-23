@@ -75,6 +75,9 @@ var connectionString = builder.Configuration.GetConnectionString("MySqlConnectio
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+builder.Services.AddMemoryCache(); // Add this first
+builder.Services.AddSession();     // Then session depends on it
+
 var app = builder.Build();
 
 
@@ -101,6 +104,7 @@ if (app.Environment.IsDevelopment())
 
 // Authentication & Authorization order matters!
 app.UseAuthentication();
+app.UseSession();
 app.UseAuthorization();
 
 // Map controllers for handling requests
