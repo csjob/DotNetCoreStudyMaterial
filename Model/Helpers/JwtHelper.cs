@@ -34,5 +34,69 @@ namespace DotNetCoreWebAPI.Model.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        
+        /// <summary>
+        /// To generate jwt token for role based authentication
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static string GenerateJwtToken(string username, UserRoles role, IConfiguration config)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(Convert.ToInt16( config["Jwt:DurationInMinutes"])),
+                signingCredentials: creds
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        
+        /// <summary>
+        /// To generate jwt token for role based authentication
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static string GenerateJwtToken(string username, string policyName, string policyValue, IConfiguration config)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, username),
+                new Claim(policyName, policyValue),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(Convert.ToInt16( config["Jwt:DurationInMinutes"])),
+                signingCredentials: creds
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+    }
+
+    public enum UserRoles
+    {
+        Admin,
+        User
     }
 }

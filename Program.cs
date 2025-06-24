@@ -70,13 +70,19 @@ builder.Services.AddSwaggerGen(c =>
 //builder.Services.AddDbContext<AppDbContext>(options =>
 //options.UseInMemoryDatabase("TestDb"));
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeManager", policy =>
+        policy.RequireClaim("Department", "Management"));
+});
+
 // EF Core + MySQL Configuration
 var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-builder.Services.AddMemoryCache(); // Add this first
-builder.Services.AddSession();     // Then session depends on it
+//builder.Services.AddMemoryCache(); // Add this first
+//builder.Services.AddSession();     // Then session depends on it
 
 var app = builder.Build();
 
@@ -104,7 +110,7 @@ if (app.Environment.IsDevelopment())
 
 // Authentication & Authorization order matters!
 app.UseAuthentication();
-app.UseSession();
+//app.UseSession();
 app.UseAuthorization();
 
 // Map controllers for handling requests

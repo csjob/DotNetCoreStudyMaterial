@@ -18,12 +18,21 @@ namespace DotNetCoreWebAPI.Controllers
         [HttpPost("login")]
         public IActionResult Login(UserLogin model)
         {
-            if(model.UserName == "admin" && model.Password == "admin")
+            if (model.UserName == "admin" && model.Password == "admin")
             {
-                var token = JwtHelper.GenerateJwtToken(model.UserName, _configuration);
-                return Ok(new {token});
+                var token = JwtHelper.GenerateJwtToken(model.UserName, UserRoles.Admin, _configuration);
+                return Ok(new { token });
             }
-            return Unauthorized();
+            else if (model.UserName == "user" && model.Password == "user")
+            {
+                var token = JwtHelper.GenerateJwtToken(model.UserName, UserRoles.User, _configuration);
+                return Ok(new { token });
+            }else if (model.UserName == "manager" && model.Password == "manager")
+            {
+                var token = JwtHelper.GenerateJwtToken(model.UserName, "Department", "Management", _configuration);
+                return Ok(new { token });
+            }
+                return Unauthorized();
         }
 
         [HttpGet("StoreCookie")]
