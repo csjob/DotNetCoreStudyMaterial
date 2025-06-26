@@ -1,6 +1,8 @@
-﻿using DotNetCoreWebAPI.DI;
+﻿using AutoMapper;
+using DotNetCoreWebAPI.DI;
 using DotNetCoreWebAPI.Model;
 using DotNetCoreWebAPI.Model.Db;
+using DotNetCoreWebAPI.Model.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +51,11 @@ namespace DotNetCoreWebAPI.Controllers
 
         #region for EF Crud Operation with MySQL
         private readonly AppDbContext _dbContext;
-        public ProductController(AppDbContext dbContext) => _dbContext = dbContext;
+        private readonly IMapper _mapper;
+        public ProductController(AppDbContext dbContext, IMapper mapper) { 
+            _dbContext = dbContext;
+            _mapper = mapper;
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAll() => 
@@ -123,6 +129,15 @@ namespace DotNetCoreWebAPI.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id);
             return Ok(single);    
         }
+
+        [HttpGet("GetProductsDto")]
+        public async Task<IActionResult> GetProductsDto()
+        {
+            var products = await _dbContext.Products.ToListAsync();
+            var dtos = _mapper.Map<List<ProductDto>>(products);
+            return Ok(dtos);
+        }
+
 
         #endregion
     }
