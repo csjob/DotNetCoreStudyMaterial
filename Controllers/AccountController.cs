@@ -1,4 +1,5 @@
 ﻿using DotNetCoreWebAPI.Model;
+using DotNetCoreWebAPI.Model.Dto;
 using DotNetCoreWebAPI.Model.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +67,14 @@ namespace DotNetCoreWebAPI.Controllers
             return Ok(user);
         }
 
-
+        //[HttpPost("Register")]
+        //public IActionResult Register(UserRegisterDto dto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);  
+        //    }
+        //    return Ok("User is valid");
+        //}
     }
 }

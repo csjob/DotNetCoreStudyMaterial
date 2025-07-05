@@ -18,6 +18,7 @@ namespace DotNetCoreWebAPI.Controllers
             _logger = logger;
         }
 
+        [HttpGet("Index")]
         public ActionResult Index()
         {
             _logger.LogInformation("Index is called");
