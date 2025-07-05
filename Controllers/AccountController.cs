@@ -67,14 +67,14 @@ namespace DotNetCoreWebAPI.Controllers
             return Ok(user);
         }
 
-        //[HttpPost("Register")]
-        //public IActionResult Register(UserRegisterDto dto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);  
-        //    }
-        //    return Ok("User is valid");
-        //}
+        [HttpPost("Register")]
+        public IActionResult Register(UserRegisterDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok("User is valid");
+        }
     }
 }

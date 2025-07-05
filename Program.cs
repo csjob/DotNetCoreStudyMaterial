@@ -1,7 +1,9 @@
 using DotNetCoreWebAPI.DI;
 using DotNetCoreWebAPI.Middleware;
 using DotNetCoreWebAPI.Model.Db;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -11,7 +13,30 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
 // Add services to the container.
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddFluentValidation(fv =>
+        fv.RegisterValidatorsFromAssemblyContaining<Program>());
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+options.InvalidModelStateResponseFactory = context =>
+{
+    var errors = context.ModelState
+    .Where(x => x.Value.Errors.Count > 0)
+    .ToDictionary(
+        e => e.Key,
+        e => e.Value.Errors.Select(x => x.ErrorMessage).ToArray()
+        );
+
+    return new BadRequestObjectResult(new
+    {
+        Message = "Validation failed",
+        Errors = errors
+    });
+
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
