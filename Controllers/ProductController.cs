@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DotNetCoreWebAPI.Controllers
 {
@@ -52,9 +53,11 @@ namespace DotNetCoreWebAPI.Controllers
         #region for EF Crud Operation with MySQL
         private readonly AppDbContext _dbContext;
         private readonly IMapper _mapper;
-        public ProductController(AppDbContext dbContext, IMapper mapper) { 
+        private readonly IMemoryCache _cache;
+        public ProductController(AppDbContext dbContext, IMapper mapper, IMemoryCache cache) { 
             _dbContext = dbContext;
             _mapper = mapper;
+            _cache = cache;
         }
 
         [HttpGet]
@@ -140,5 +143,37 @@ namespace DotNetCoreWebAPI.Controllers
 
 
         #endregion
+
+        #region Cache Concept
+        [HttpGet("GetAllProducts")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            if(!_cache.TryGetValue("all-products", out List<Product> products))
+            {
+                products = await _dbContext.Products.ToListAsync();
+
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+
+                _cache.Set("all-products", products, cacheOptions);
+            }
+            return Ok(products);
+        }
+
+        [HttpGet("get-time")]
+        [ResponseCache(Duration = 60)]
+        public IActionResult GetTime()
+        {
+            return Ok(DateTime.Now);
+        }
+
+        [HttpPost("get-time-post")] // this cache does not work. because it is post request.
+        [ResponseCache(Duration = 60)]
+        public IActionResult GetTimePost()
+        {
+            return Ok(DateTime.Now); 
+        }
+
+        #endregion 
     }
 }

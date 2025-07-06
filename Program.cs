@@ -115,8 +115,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(Program));// or typeof(AutoMapperProfile)
 
-//builder.Services.AddMemoryCache(); // Add this first
+builder.Services.AddMemoryCache(); // Add this first
 //builder.Services.AddSession();     // Then session depends on it
+
+builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
@@ -151,6 +153,8 @@ app.UseAuthorization();
 
 // Map controllers for handling requests
 app.MapControllers();
+
+app.UseResponseCaching();
 
 app.Run();
 
