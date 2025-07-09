@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using DotNetCoreWebAPI.DI;
 using DotNetCoreWebAPI.Middleware;
 using DotNetCoreWebAPI.Model.Db;
@@ -118,6 +119,14 @@ builder.Services.AddAutoMapper(typeof(Program));// or typeof(AutoMapperProfile)
 builder.Services.AddMemoryCache(); // Add this first
 //builder.Services.AddSession();     // Then session depends on it
 
+builder.Services.Configure<IpRateLimitOptions>(
+    builder.Configuration.GetSection("IpRateLimiting"));
+
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+
 builder.Services.AddResponseCaching();
 
 var app = builder.Build();
@@ -138,6 +147,8 @@ app.Use(async (context, next) =>
 app.UseMiddleware<MyCustomMiddleware>();
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseIpRateLimiting();
 
 // Configure the HTTP request pipeline for development mode
 if (app.Environment.IsDevelopment())
